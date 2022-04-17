@@ -1,4 +1,4 @@
-# [Roon](https://roonlabs.com) [Extension](node-roon-api) to provide [volume control](https://github.com/RoonLabs/node-roon-api-volume-control) for [CamillaDSP's](https://github.com/HEnquist/camilladsp) via its built-in WebSocket server.
+# [Roon](https://roonlabs.com) [Extension](node-roon-api) to provide [volume control](https://github.com/RoonLabs/node-roon-api-volume-control) for [CamillaDSP](https://github.com/HEnquist/camilladsp).
 
 This extension connects to your CamillaDSP's instalnce via WebSocket, and allows Roon to control it's volume in-app.
 
