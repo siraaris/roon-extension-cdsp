@@ -2,7 +2,7 @@
 
 This extension connects to your CamillaDSP's instalnce via WebSocket, and allows Roon to control volume in-app.
 
-This is an alternative to controlling CammillaDSP's volume via Camilla Backend and GUI.
+This is an alternative to controlling CammillaDSP's volume via CamillaDSP's Backend and GUI.
 
 Make sure to configure CamillaDSP to start with a WebSockets by specifying --port=.
 
