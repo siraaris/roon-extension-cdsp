@@ -14,4 +14,4 @@ To run this extension, in the directory:
 
 $ npm install
 
-$ node .
+$ node app.js
