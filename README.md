@@ -12,4 +12,4 @@ Note, there is no need to run camilladsp-backend or camilladsp-gui to use this e
 
 To run this extension, in the directory:
 
-# node .
+$ node .
