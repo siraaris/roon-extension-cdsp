@@ -15,3 +15,10 @@ To run this extension, in the directory:
 $ npm install
 
 $ node app.js
+
+# Notes
+
+* Based on elements from [roon-extension-devialet-phantom-volume](https://github.com/RoonLabs/roon-extension-devialet-phantom-volume) & [roon-extension-rotel](https://github.com/bsc101/roon-extension-rotel).
+* I learnt what I needed to get this running, not a programmer, use at own risk.
+* Recommend (highly) turning off amplifiers and test, test, test before using with amplifiers on.
+
