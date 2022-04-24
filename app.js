@@ -192,10 +192,12 @@ var roon = new RoonApi({
 });
 
 var mysettings = roon.load_config("settings" + instance) || {
+    id: uuid.v5({ namespace: uuid.namespace.url, name: "CamillaDSP Client" }),
     displayname: "CamillaDSP Client",
     hostname: "127.0.0.1",
     port: "1234",
-    id: uuid.v5({ namespace: uuid.namespace.url, name: "CamillaDSP Client" })
+    minvol: "-80",
+    maxvol: "-20"
 };
 
 function make_layout(settings) {
@@ -225,6 +227,20 @@ function make_layout(settings) {
         subtitle:  "The port of your CamillaDSP device (e.g. 1234)",
         maxlength: 5,
         setting:   "port"
+    });
+    l.layout.push({
+        type:      "string",
+        title:     "Lower Volume Limit",
+        subtitle:  "The lower limit for volume of your CamillaDSP device (e.g. -80)",
+        maxlength: 3,
+        setting:   "minvol"
+    });
+    l.layout.push({
+        type:      "string",
+        title:     "Upper Volume Limit",
+        subtitle:  "The upper limit for volume of your CamillaDSP device (e.g. -20)",
+        maxlength: 3,
+        setting:   "maxvol"
     });
 
     return l;
@@ -293,14 +309,18 @@ function setup() {
         //console.log(r, what);
 
         if (what == "connected") {
-	    if (!mysettings.hostname)
-		return;
-	    if (mysettings.hostname.length <= 0)
-		return;
-	    if (!mysettings.port)
-		return;
-	    if (mysettings.port.length <= 0)
-		return;
+
+	    if (!mysettings.hostname) return;
+	    if (mysettings.hostname.length <= 0) return;
+
+	    if (!mysettings.port) return;
+	    if (mysettings.port.length <= 0) return;
+
+	    if (!mysettings.minvol) return;
+	    if (mysettings.minvol.length <=0) return;
+
+	    if (!mysettings.maxvol) return;
+	    if (mysettings.maxvol.length <=0) return;
 
             if (r.volume_control) {
                 r.volume_control.destroy();
@@ -341,8 +361,8 @@ async function ev_connected(r) {
             control_key:  r.id,
 	    display_name: `${r.name}`,
 	    volume_type:  "number",
-	    volume_min:   -80,
-	    volume_max:   -20,
+	    volume_min:   mysettings.minvol,
+	    volume_max:   mysettings.maxvol,
             volume_value: r.actual_volume,
 	    volume_step:  1.0,
             is_muted:     r.actual_mute
