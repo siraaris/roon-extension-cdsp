@@ -1,0 +1,17 @@
+{
+  "name": "roon-extension-cdsp",
+  "version": "0.0.2",
+  "description": "Roon Extension to control CamillaDSP's volume",
+  "main": "app.js",
+  "author": "Aris Theocharides",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "debug": "^4.3.4",
+    "node-roon-api": "github:roonlabs/node-roon-api",
+    "node-roon-api-settings": "github:roonlabs/node-roon-api-settings",
+    "node-roon-api-status": "github:roonlabs/node-roon-api-status",
+    "node-roon-api-volume-control": "github:roonlabs/node-roon-api-volume-control",
+    "uuid": "^8.3.2",
+    "uuid-1345": "^1.0.2"
+  }
+}
