@@ -9,3 +9,7 @@ Make sure to configure CamillaDSP to start with an accessible websocket by speci
 To use this extension within Roon, set configuration in Settings->Extensions, and then go to the Roon zone that is playing to CamillaDSP, and go to device setup. Then change the volume control mechanism to be this extension.
 
 Note, there is no need to run camilladsp-backend or camilladsp-gui to use this extension, as it uses WebSockets to camilladsp directly.
+
+To run this extension, in the directory:
+
+# node .
