@@ -18,7 +18,7 @@ $ node app.js
 
 # Notes
 
-* Based on elements from [roon-extension-devialet-phantom-volume](https://github.com/RoonLabs/roon-extension-devialet-phantom-volume) & [roon-extension-rotel](https://github.com/bsc101/roon-extension-rotel).
-* I learnt what I needed to get this running, not a programmer, use at own risk.
+* Based (heavily) on [roon-extension-devialet-phantom-volume](https://github.com/RoonLabs/roon-extension-devialet-phantom-volume) & [roon-extension-rotel](https://github.com/bsc101/roon-extension-rotel), and on other extensions referenced there.
+* I learnt what I needed to get this running, not a programmer, use at own risk etc.
 * Recommend (highly) turning off amplifiers and test, test, test before using with amplifiers on.
-* You may need to set values in Settings->Extensions, save and restart the extension (kill node and restart).
+* You may need to set values in Settings->Extensions, save and restart the extension (kill node and restart the first time you configure the extension).
