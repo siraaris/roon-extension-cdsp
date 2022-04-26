@@ -222,7 +222,8 @@ var mysettings = roon.load_config("settings") || {
     hostname: "127.0.0.1",
     port: "1234",
     minvol: "-80",
-    maxvol: "-20"
+    maxvol: "-20",
+    id: LocationId
 };
 
 function make_layout(settings) {
@@ -283,8 +284,23 @@ var svc_settings = new RoonApiSettings(roon, {
 
         if (!isdryrun && !l.has_error)
         {
+           var pre_displayname = mysettings.displayname;
+           var pre_hostname = mysettings.hostname;
+           var pre_port = mysettings.port;
+           var pre_minvol = mysettings.minvol;
+           var pre_maxvol = mysettings.maxvol;
+
             mysettings = l.values;
             svc_settings.update_settings(l);
+
+            if (pre_displayname != mysettings.displayname || pre_hostname != mysettings.hostname || pre_port != mysettings.port || pre_minvol != mysettings.port || pre_maxvol != mysettings.maxvol) {
+                console.log("pre_displayname / mysettings.displayname", pre_displayname, mysettings.displayname);
+                console.log("pre_hostname / mysettings.hostname", pre_hostname, mysettings.hostname);
+                console.log("pre_port / mysettings.port", pre_port, mysettings.port);
+                console.log("pre_minvol / mysettings.minvol", pre_minvol, mysettings.minvol);
+                console.log("pre_maxvol / mysettings.maxvol", pre_maxvol, mysettings.maxvol);
+                setup();
+            }
             roon.save_config("settings", mysettings);
         }
     }
