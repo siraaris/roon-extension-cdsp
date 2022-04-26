@@ -22,3 +22,4 @@ $ node app.js
 * I learnt what I needed to get this running, not a programmer, use at own risk etc.
 * Recommend (highly) turning off amplifiers and test, test, test before using with amplifiers on.
 * You may need to set values in Settings->Extensions, save and restart the extension (kill node and restart the first time you configure the extension).
+* The extension will try every 5 seconds if the connection to CamillaDSP is closed (i.e. CamillaDSP stops running). Advise that CamillaDSP is kept running with an autostart mechanism.
