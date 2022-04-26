@@ -21,5 +21,4 @@ $ node app.js
 * Based (heavily) on [roon-extension-devialet-phantom-volume](https://github.com/RoonLabs/roon-extension-devialet-phantom-volume) & [roon-extension-rotel](https://github.com/bsc101/roon-extension-rotel), and on other extensions referenced there.
 * I learnt what I needed to get this running, not a programmer, use at own risk etc.
 * Recommend (highly) turning off amplifiers and test, test, test before using with amplifiers on.
-* You may need to set values in Settings->Extensions, save and restart the extension (kill node and restart the first time you configure the extension).
-* The extension will try every 5 seconds if the connection to CamillaDSP is closed (i.e. CamillaDSP stops running). Advise that CamillaDSP is kept running with an autostart mechanism.
+* The extension will try to reconnect every 5 seconds if the connection to CamillaDSP is closed (i.e. CamillaDSP stops running). Advise that CamillaDSP is kept running with an autostart mechanism.
