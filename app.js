@@ -10,17 +10,20 @@ const ws         = require('ws'),
 var RoonApi              = require('node-roon-api'),
     RoonApiStatus        = require('node-roon-api-status'),
     RoonApiSettings      = require('node-roon-api-settings'),
-    RoonApiVolumeControl = require('node-roon-api-volume-control');
+    RoonApiVolumeControl = require('node-roon-api-volume-control')
+    ;
 
-var remotes = {};
+var CamillaURL;
+var CamillaUUID;
 
-var Location;
-var LocationId;
+var connection;
 
-var initialConnect = false;
-var reConnect = false;
+var socket;
+var remote;
 
-function Remote(socket) {
+var cdsp = {};
+
+function Remote() {
     this.getState = async () => {
         let gS = "\"GetState\"\n";
         socket.send(gS);
@@ -52,35 +55,23 @@ function Remote(socket) {
    };
 }
 
-
 function Establish(cb) {
-    const { randomUUID } = require('crypto');
 
-    Location = "ws://" + mysettings.hostname + ":" + mysettings.port + "/";
-    LocationId = UUID.v5({ namespace: UUID.namespace.url, name: Location });
-
-    if (remotes[LocationId]) {
-        console.log("Remote already exists, devices: ", devices);
-        return;
-    }
+    CamillaURL = "ws://" + mysettings.hostname + ":" + mysettings.port;
+    CamillaUUID = UUID.v5({ namespace: UUID.namespace.url, name: CamillaURL });
 
     var timerID = 0;
+
+    connection = 0;
+
     var wsStart = function () {
 
-        var socket = new ws.WebSocket(Location);
+        socket = new ws.WebSocket(CamillaURL);
+        remote = new Remote(socket);
 
-        let remote = remotes[LocationId] = new Remote(socket);
-    
         socket.on('open', function (open) {
             if (socket) {
-                if (initialConnect == false) {
-                    initialConnect = true;
-                }
-                else {
-                    if (reConnect == false) {
-                        reConnect = true;
-                    }
-                }
+                connection++;
                 console.log("pinger", "open");
                 if (timerID) {
                     console.log("*** Clear timer...");
@@ -117,20 +108,19 @@ function Establish(cb) {
 
         socket.on('message', function (message) {
 
-            //console.log("pinger", "message START");
-
             if (socket) {
 
                 let msg = JSON.parse(message);
 
                 if (msg.GetState) {
                     if (msg.GetState.result == "Ok") {
-                        //console.log("pinger", "message", "GetState - ", msg.GetState.value);
+                        console.log("pinger", "message", "GetState - ", msg.GetState.value);
                         remote.actual_state = msg.GetState.value;
+                        cdsp.actual_state = msg.GetState.value;
                         remote.trigger = "get_state_ok";
                         cb(remote, 'message');
                     } else {
-                        //console.log("pinger", "error (GetState)");
+                        console.log("pinger", "error (GetState)");
                         socket.terminate();
                         remote.trigger = "get_state_error";
                         cb(remote, 'disconnected');
@@ -138,12 +128,13 @@ function Establish(cb) {
                 }
                 else if (msg.GetVolume) {
                     if (msg.GetVolume.result == "Ok") {
-                        //console.log("pinger", "message", "GetVolume - ", msg.GetVolume.value);
+                        console.log("pinger", "message", "GetVolume - ", msg.GetVolume.value);
                         remote.actual_volume = msg.GetVolume.value;
+                        cdsp.actual_volume = msg.GetVolume.value;
                         remote.trigger = "get_volume_ok";
                         cb(remote, 'message');
                     } else {
-                        //console.log("pinger", "error (GetVolume)");
+                        console.log("pinger", "error (GetVolume)");
                         socket.terminate();
                         remote.trigger = "get_volume_error";
                         cb(remote, 'disconnected');
@@ -151,12 +142,13 @@ function Establish(cb) {
                 }
                 else if (msg.GetMute) {
                     if (msg.GetMute.result == "Ok") {
-                        //console.log("pinger", "message", "GetMute - ", msg.GetMute.value);
+                        console.log("pinger", "message", "GetMute - ", msg.GetMute.value);
                         remote.actual_mute = msg.GetMute.value;
+                        cdsp.actual_mute = msg.GetMute.value;
                         remote.trigger = "get_mute_ok";
                         cb(remote, 'message');
                     } else {
-                        //console.log("pinger", "error (GetMute)");
+                        console.log("pinger", "error (GetMute)");
                         socket.terminate();
                         remote.trigger = "get_mute_error";
                         cb(remote, 'disconnected');
@@ -164,11 +156,11 @@ function Establish(cb) {
                 }
                 else if (msg.SetVolume) {
                     if (msg.SetVolume.result == "Ok") {
-                        //console.log("pinger", "message", "SetVolume - OK");
+                        console.log("pinger", "message", "SetVolume - OK");
                         remote.trigger = "set_volume_ok";
                     cb(remote, 'message');
                     } else {
-                        //console.log("pinger", "error (SetVolume)");
+                        console.log("pinger", "error (SetVolume)");
                         socket.terminate();
                         remote.trigger = "set_volume_error";
                         cb(remote, 'disconnected');
@@ -176,11 +168,11 @@ function Establish(cb) {
                 }
                 else if (msg.SetMute) {
                     if (msg.SetMute.result == "Ok") {
-                        //console.log("pinger", "message", "SetMute - OK");
+                        console.log("pinger", "message", "SetMute - OK");
                         remote.trigger = "set_mute_ok";
                         cb(remote, 'message');
                     } else {
-                        //console.log("pinger", "error (SetMute)");
+                        console.log("pinger", "error (SetMute)");
                         socket.terminate();
                         remote.trigger = "set_mute_error";
                         cb(remote, 'disconnected');
@@ -201,7 +193,7 @@ function Establish(cb) {
 var roon = new RoonApi({
     extension_id:        'audio.3sb.roon.cdsp',
     display_name:        'CamillaDSP Volume/Mute Control',
-    display_version:     "0.0.2",
+    display_version:     "0.0.3",
     publisher:           '3sb.audio',
     email:               'info@3sb.audio',
     website:             'https://github.com/siraaris/roon-extension-cdsp',
@@ -223,7 +215,7 @@ var mysettings = roon.load_config("settings") || {
     port: "1234",
     minvol: "-80",
     maxvol: "-20",
-    id: LocationId
+    id: 1
 };
 
 function make_layout(settings) {
@@ -273,40 +265,23 @@ function make_layout(settings) {
 }
 
 var svc_settings = new RoonApiSettings(roon, {
-    get_settings: function(cb)
-    {
+    get_settings: function(cb) {
         cb(make_layout(mysettings));
     },
-    save_settings: function(req, isdryrun, settings)
-    {
+    save_settings: function(req, isdryrun, settings) {
         let l = make_layout(settings.values);
         req.send_complete(l.has_error ? "NotValid" : "Success", { settings: l });
 
-        if (!isdryrun && !l.has_error)
-        {
-           var pre_displayname = mysettings.displayname;
-           var pre_hostname = mysettings.hostname;
-           var pre_port = mysettings.port;
-           var pre_minvol = mysettings.minvol;
-           var pre_maxvol = mysettings.maxvol;
+        if (!isdryrun && !l.has_error) {
 
             mysettings = l.values;
             svc_settings.update_settings(l);
-
-            if (pre_displayname != mysettings.displayname || pre_hostname != mysettings.hostname || pre_port != mysettings.port || pre_minvol != mysettings.port || pre_maxvol != mysettings.maxvol) {
-                console.log("pre_displayname / mysettings.displayname", pre_displayname, mysettings.displayname);
-                console.log("pre_hostname / mysettings.hostname", pre_hostname, mysettings.hostname);
-                console.log("pre_port / mysettings.port", pre_port, mysettings.port);
-                console.log("pre_minvol / mysettings.minvol", pre_minvol, mysettings.minvol);
-                console.log("pre_maxvol / mysettings.maxvol", pre_maxvol, mysettings.maxvol);
-                setup();
-            }
             roon.save_config("settings", mysettings);
+
         }
     }
 });
 
-let devices = 0;
 var svc_status = new RoonApiStatus(roon);
 var svc_volume_control = new RoonApiVolumeControl(roon);
 
@@ -314,35 +289,69 @@ roon.init_services({
     provided_services: [ svc_status, svc_settings, svc_volume_control ]
 });
 
+
+
 function setup () {
+
     new Establish((r, what) => {
 
         if (what == "connected") {
-            devices = 1;
             ev_connected(r);
         }
         else if (what == "message") {
             ev_message(r);
         }
         else {
-            devices = 0;
             ev_disconnected(r);
         } 
     });
-    svc_status.set_status("Searching...", false);
+    svc_status.set_status(`Setting up... ${CamillaUUID} on connection ${connection}`, false);
 }
 
 async function ev_connected(r) {
-    svc_status.set_status(`Found ${devices} ${devices == 1 ? "device" : "devices"}`, false);
 
-    await r.getState();
-    await r.getVolume();
-    await r.getMute();
+    if (cdsp.volume_control)
+    {
+/*
+        console.log("r.volume_control:\n", r.volume_control);
+        console.log("cdsp.volume_control:\n", cdsp.volume_control);
+*/
+//      await r.getState();
+        await r.getVolume();
+        await r.getMute();
 
-    if (!reConnect) {
-        r.volume_control = svc_volume_control.new_device( {
+        svc_status.set_status(`Reconnected ${CamillaUUID} on connection ${connection}`, false);
+/*
+        console.log("Reconnected...");
+        console.log("State (r): ", r.actual_state);
+        console.log("State (cdsp): ", cdsp.actual_state);
+        console.log("Mute (r): ", r.actual_mute);
+        console.log("Mute (cdsp): ", cdsp.actual_mute);
+        console.log("Volume (r): ", r.actual_volume);
+        console.log("Volume (cdsp): ", r.actual_volume);
+        console.log("Min Volume: ", mysettings.minvol);
+        console.log("Max Volume: ", mysettings.maxvol);
+*/
+        cdsp.volume_control.update_state({ 
+            is_muted:     r.actual_mute,
+            volume_value: r.actual_volume,
+            volume_min:   mysettings.minvol,
+            volume_max:   mysettings.maxvol
+        });
+
+        return;
+    }
+    else {
+
+        svc_status.set_status(`Connected ${CamillaUUID} on connection ${connection}`, false);
+
+//      await r.getState();
+        await r.getVolume();
+        await r.getMute();
+
+        cdsp.volume_control = svc_volume_control.new_device( {
             state: {
-                control_key:  mysettings.id,
+                control_key:  CamillaUUID,
                 display_name: mysettings.displayname,
                 volume_type:  "number",
                 volume_min:   mysettings.minvol,
@@ -352,6 +361,7 @@ async function ev_connected(r) {
                 is_muted:     r.actual_mute
             },
             set_volume: async function (req, mode, value) {
+
                 await r.getVolume();
 
                 let newvol = mode == "absolute" ? value : (r.actual_volume + value);
@@ -364,6 +374,7 @@ async function ev_connected(r) {
                 req.send_complete("Success");
             },
             set_mute: async function (req, action) {
+
                 await r.getMute();
 
                 let mute = action == 'on';
@@ -378,39 +389,39 @@ async function ev_connected(r) {
 }
 
 async function ev_message(r) {
-    if (r.volume_control) {
+    svc_status.set_status(`Processing ${CamillaUUID} on connection ${connection}`, false);
+
+    if (cdsp.volume_control) {
 
         if (r.trigger == "get_volume_ok") {
-            r.volume_control.update_state({ volume_value: r.actual_volume });
+            cdsp.volume_control.update_state({ volume_value: r.actual_volume });
+            console.log("Setting volume (r.actual_volume) in ev_message: ", r.actual_volume);
         } else
         if (r.trigger == "get_mute_ok") {
-            r.volume_control.update_state({ is_muted: r.actual_mute });
+            cdsp.volume_control.update_state({ is_muted: r.actual_mute });
+            console.log("Setting mute (r.actual_mute) in ev_message: ", r.actual_mute);
         }
     } else {
-        console.log("ev_message: r.trigger", r.trigger);
+        console.log("ev_message: No Volume Control - r.trigger", r.trigger);
     }
 }
 
-function ev_disconnected(r) {
-    svc_status.set_status("Disconnected...", false);
-
-//    if (r.volume_control) { r.volume_control.destroy(); delete(r.volume_control); }
-
-//    roon.init_services({
-//        provided_services: [ svc_status, svc_settings, svc_volume_control ]
-//    });
+function ev_disconnected(c) {
+    svc_status.set_status(`Disconnected ${CamillaUUID} on connection ${connection}`, false);
 }
 
 function ev_volume(r, val) {
     console.log("[CamillaDSP Volume Extension] received volume change from device:", val);
-    if (r.volume_control)
+    if (r.volume_control) {
         r.volume_control.update_state({ volume_value: val });
+    }
 }
 
 function ev_mute(r, val) {
     console.log("[CamillaDSP Volume Extension] received volume change from device:", val);
-    if (r.volume_control)
+    if (r.volume_control) {
         r.volume_control.update_state({ is_muted: val });
+    }
 }
 
 setup();
