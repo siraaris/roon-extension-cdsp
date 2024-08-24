@@ -1,8 +1,8 @@
 # [Roon](https://roonlabs.com) [Extension](node-roon-api) to provide volume control for [CamillaDSP](https://github.com/HEnquist/camilladsp).
 
-This extension connects to CamillaDSP via WebSocket, and allows Roon to control volume and muting in-app.
+This extension connects to CamillaDSP via WebSocket, and enables Roon to control CamillaDSP's volume and muting in-app.
 
-This is an alternative to controlling CammillaDSP's volume via CamillaDSP's Backend and GUI.
+This is an alternative to controlling CamillaDSP's volume via CamillaDSP's Backend and GUI.
 
 Make sure to configure CamillaDSP to start with an accessible websocket by specifying --port=1234 and --address=192.168.1.130 (the IP address of the host running the extension). 
 
