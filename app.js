@@ -116,7 +116,7 @@ function Establish(cb) {
                     if (msg.GetState.result == "Ok") {
                         console.log("pinger", "message", "GetState - ", msg.GetState.value);
                         remote.actual_state = msg.GetState.value;
-                        cdsp.actual_state = msg.GetState.value;
+                        cdsp.actual_state = remote.GetState.value;
                         remote.trigger = "get_state_ok";
                         cb(remote, 'message');
                     } else {
@@ -130,7 +130,7 @@ function Establish(cb) {
                     if (msg.GetVolume.result == "Ok") {
                         console.log("pinger", "message", "GetVolume - ", msg.GetVolume.value);
                         remote.actual_volume = msg.GetVolume.value;
-                        cdsp.actual_volume = msg.GetVolume.value;
+                        cdsp.actual_volume = remote.GetVolume.value;
                         remote.trigger = "get_volume_ok";
                         cb(remote, 'message');
                     } else {
@@ -144,7 +144,7 @@ function Establish(cb) {
                     if (msg.GetMute.result == "Ok") {
                         console.log("pinger", "message", "GetMute - ", msg.GetMute.value);
                         remote.actual_mute = msg.GetMute.value;
-                        cdsp.actual_mute = msg.GetMute.value;
+                        cdsp.actual_mute = remote.GetMute.value;
                         remote.trigger = "get_mute_ok";
                         cb(remote, 'message');
                     } else {
@@ -193,7 +193,7 @@ function Establish(cb) {
 var roon = new RoonApi({
     extension_id:        'audio.3sb.roon.cdsp',
     display_name:        'CamillaDSP Volume/Mute Control',
-    display_version:     "0.0.3",
+    display_version:     "0.0.4",
     publisher:           '3sb.audio',
     email:               'info@3sb.audio',
     website:             'https://github.com/siraaris/roon-extension-cdsp',
