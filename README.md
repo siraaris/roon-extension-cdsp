@@ -14,7 +14,11 @@ To run this extension, in the directory:
 
 $ npm install
 
+This may complain about a security issue with the npm ip module, but if Roon is running in your home and private environment then this might be a low risk.
+
 $ node app.js
+
+This may fail, see https://github.com/RoonLabs/node-roon-api/pull/38/commits/e0a51b72795fe9921d7b2b12d9c0102a475faa60
 
 # Notes
 
@@ -22,3 +26,4 @@ $ node app.js
 * I learnt what I needed to get this running, not a Javascript programmer, use at own risk etc.
 * Recommend (highly) turning off amplifiers and test, test, test before using with amplifiers on.
 * The extension will try to reconnect every 5 seconds if the connection to CamillaDSP is closed (i.e. CamillaDSP stops running). Advise that CamillaDSP is kept running with an autostart mechanism.
+
